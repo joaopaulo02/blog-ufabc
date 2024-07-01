@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog UFABC</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Blog UFABC</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="create.html">Criar Post</a>
+        </nav>
+    </header>
+    <main>
+        <section id="filter">
+            <h2>Filtrar Posts</h2>
+            <label for="filter-title">Título:</label>
+            <input type="text" id="filter-title" oninput="filterPosts()">
+            
+            <label for="filter-date">Data:</label>
+            <input type="date" id="filter-date" oninput="filterPosts()">
+        </section>
+        <section id="posts">
+            <!-- Posts serão carregados dinamicamente aqui -->
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
