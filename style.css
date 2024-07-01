@@ -150,6 +150,7 @@ form button:hover {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
+    margin-bottom: 20px;
 }
 
 /* Estilo dos botões de ação nos posts */
