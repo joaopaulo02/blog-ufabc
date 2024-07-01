@@ -172,3 +172,8 @@ form button:hover {
 .post-buttons button:hover {
     background-color: #ffdd33; /* Amarelo mais claro */
 }
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
