@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog UFABC</title>
+    <title>Nosso Blog - UFABC</title>
+    <link rel="icon" href="https://curricularizacao.proec.ufabc.edu.br/wp-content/uploads/logotipo-ufabc-abaixo-6-e1659735954330.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Blog UFABC</h1>
+        <h1>Nosso Blog - UFABC</h1>
+        <p>Grupo: João Paulo Alonso, Ruan Diego Sousa, Gabriel A. de Souza, Daniel Carvalho e Luis Carlos Berrio</p>
     </header>
     
     <section id="createPost" style="display: none;">
@@ -36,7 +38,11 @@
         <input type="text" id="filterTitle" placeholder="Filtrar por título">
         <input type="date" id="filterDate">
         <button onclick="filterPosts()">Filtrar</button>
+        <span id="postList">
+            <!-- Filtro de posts aparecerá aqui -->
+        </span>
     </section>
+
     
 
     <!-- Seção para exibir posts recentes -->
