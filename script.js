@@ -1,169 +1,200 @@
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('post-form')) {
-        document.getElementById('post-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+// script.js
 
-            let title = document.getElementById('title').value;
-            let author = document.getElementById('author').value;
-            let content = document.getElementById('content').value;
-            let imageFile = document.getElementById('image').files[0];
-            let timestamp = new Date().toISOString();
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAVp16Nnxsj5EBQmn7hbBbI_kfvTiQNXac",
+    authDomain: "blog-ufabc-ddbe4.firebaseapp.com",
+    projectId: "blog-ufabc-ddbe4",
+    storageBucket: "blog-ufabc-ddbe4.appspot.com",
+    messagingSenderId: "865379869123",
+    appId: "1:865379869123:web:09c347dee3ea3a154d5d76",
+    measurementId: "G-VQNXV3PNZ5"
+};
 
-            let post = {
-                title: title,
-                author: author,
-                content: content,
-                timestamp: timestamp,
-                image: ''
-            };
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
 
-            if (imageFile) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    post.image = e.target.result;
-                    savePost(post);
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                savePost(post);
-            }
+// Inicializa o Firestore
+const db = firebase.firestore();
+
+// Função para buscar os posts mais recentes
+function fetchRecentPosts() {
+    db.collection('posts')
+        .orderBy('timestamp', 'desc')
+        .limit(5) // Limita a 5 posts mais recentes (ajuste conforme necessário)
+        .get()
+        .then(querySnapshot => {
+            const posts = [];
+            querySnapshot.forEach(doc => {
+                posts.push({ id: doc.id, ...doc.data() });
+            });
+            displayRecentPosts(posts);
+        })
+        .catch(error => {
+            console.error('Erro ao buscar posts recentes:', error);
         });
-    }
-    loadPosts();
-});
-
-function savePost(post) {
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    posts.push(post);
-    localStorage.setItem('posts', JSON.stringify(posts));
-
-    // Exibir aviso de que o post foi publicado
-    alert('Post publicado com sucesso!');
-
-    window.location.href = 'index.html';
 }
 
-function loadPosts() {
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    let postSection = document.getElementById('posts');
+// Função para exibir os posts recentes na página
+function displayRecentPosts(posts) {
+    const recentPostsSection = document.getElementById('recentPosts');
 
-    postSection.innerHTML = '';
-
-    // Adicionando o título "Posts Publicados"
-    let postsTitle = document.createElement('h2');
-    postsTitle.textContent = 'Posts Publicados';
-    postSection.appendChild(postsTitle);
+    recentPostsSection.innerHTML = ''; // Limpa o conteúdo existente
 
     posts.forEach(post => {
-        let postDiv = document.createElement('div');
-        postDiv.classList.add('post');
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
 
-        let postTitle = document.createElement('h3');
-        postTitle.textContent = post.title;
-        postDiv.appendChild(postTitle);
+        // Monta a estrutura do post
+        postElement.innerHTML = `
+            <h3>${post.title}</h3>
+            <p>Autor: ${post.author}</p>
+            <p>${post.content}</p>
+            <button onclick="deletePost('${post.id}')">Excluir</button>
+        `;
 
-        let postAuthor = document.createElement('p');
-        postAuthor.textContent = 'Autor: ' + post.author;
-        postDiv.appendChild(postAuthor);
-
-        let postDate = document.createElement('p');
-        postDate.textContent = 'Data: ' + new Date(post.timestamp).toLocaleString();
-        postDiv.appendChild(postDate);
-
-        let postContent = document.createElement('p');
-        postContent.textContent = post.content;
-        postDiv.appendChild(postContent);
-
-        if (post.image) {
-            let postImage = document.createElement('img');
-            postImage.src = post.image;
-            postImage.alt = post.title; // Adicionando um atributo alt para acessibilidade
-            postDiv.appendChild(postImage);
-        }
-
-        let postButtons = document.createElement('div');
-        postButtons.classList.add('post-buttons');
-
-        let deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
-        deleteButton.onclick = function() {
-            postDiv.remove();
-            deletePost(post.timestamp);
-        };
-        postButtons.appendChild(deleteButton);
-
-        postDiv.appendChild(postButtons);
-        postSection.appendChild(postDiv);
+        recentPostsSection.appendChild(postElement);
     });
 }
 
-function deletePost(timestamp) {
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    posts = posts.filter(p => p.timestamp !== timestamp);
-    localStorage.setItem('posts', JSON.stringify(posts));
-}
-
+// Função para filtrar os posts
 function filterPosts() {
-    let filterTitle = document.getElementById('filter-title').value.toLowerCase();
-    let filterDate = document.getElementById('filter-date').value;
+    let filteredPosts = [];
 
-    let posts = JSON.parse(localStorage.getItem('posts')) || [];
-    let postSection = document.getElementById('posts');
+    // Obtém os valores dos campos de filtro
+    const titleFilter = filterTitle.value.toLowerCase();
+    const dateFilter = filterDate.value;
 
-    postSection.innerHTML = '';
+    // Referência ao Firestore
+    const db = firebase.firestore();
 
-    let filteredPosts = posts.filter(post => {
-        let postTitle = post.title.toLowerCase();
-        let postDate = post.timestamp.split('T')[0];
+    // Consulta no Firestore com filtros
+    db.collection('posts')
+        .orderBy('timestamp', 'desc') // Ordena por data de forma decrescente
+        .get()
+        .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+                const post = doc.data();
+                const postTitle = post.title.toLowerCase();
+                const postDate = post.timestamp.toDate();
 
-        return (!filterTitle || postTitle.includes(filterTitle)) &&
-               (!filterDate || postDate === filterDate);
-    });
+                // Verifica se o título do post contém o filtro de título
+                // E se a data do post é maior ou igual à data filtrada
+                if (postTitle.includes(titleFilter) &&
+                    (!dateFilter || postDate.toISOString().split('T')[0] === dateFilter)) {
+                    filteredPosts.push({ id: doc.id, ...post });
+                }
+            });
 
-    // Adicionando o título "Posts Publicados"
-    let postsTitle = document.createElement('h2');
-    postsTitle.textContent = 'Posts Publicados';
-    postSection.appendChild(postsTitle);
+            // Atualiza a lista de posts exibidos com os posts filtrados
+            displayPosts(filteredPosts);
 
-    filteredPosts.forEach(post => {
-        let postDiv = document.createElement('div');
-        postDiv.classList.add('post');
+            // Se não houver resultados, exibe uma mensagem
+            if (filteredPosts.length === 0) {
+                showNoResultsMessage();
+            } else {
+                hideNoResultsMessage();
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao filtrar posts:', error);
+        });
+}
 
-        let postTitle = document.createElement('h3');
-        postTitle.textContent = post.title;
-        postDiv.appendChild(postTitle);
+// Função para exibir mensagem de nenhum resultado encontrado
+function showNoResultsMessage() {
+    const noResultsMessage = document.createElement('p');
+    noResultsMessage.textContent = 'Nenhum resultado encontrado.';
+    noResultsMessage.id = 'noResultsMessage';
 
-        let postAuthor = document.createElement('p');
-        postAuthor.textContent = 'Autor: ' + post.author;
-        postDiv.appendChild(postAuthor);
+    // Adiciona a mensagem após a seção de posts
+    const postList = document.getElementById('postList');
+    postList.innerHTML = ''; // Limpa o conteúdo atual
+    postList.appendChild(noResultsMessage);
+}
 
-        let postDate = document.createElement('p');
-        postDate.textContent = 'Data: ' + new Date(post.timestamp).toLocaleString();
-        postDiv.appendChild(postDate);
+// Função para esconder mensagem de nenhum resultado encontrado
+function hideNoResultsMessage() {
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
+}
 
-        let postContent = document.createElement('p');
-        postContent.textContent = post.content;
-        postDiv.appendChild(postContent);
 
-        if (post.image) {
-            let postImage = document.createElement('img');
-            postImage.src = post.image;
-            postImage.alt = post.title; // Adicionando um atributo alt para acessibilidade
-            postDiv.appendChild(postImage);
-        }
+// Função para exibir os posts na página
+function displayPosts(posts) {
+    const postList = document.getElementById('postList');
 
-        let postButtons = document.createElement('div');
-        postButtons.classList.add('post-buttons');
+    postList.innerHTML = '';
 
-        let deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Excluir';
-        deleteButton.onclick = function() {
-            postDiv.remove();
-            deletePost(post.timestamp);
-        };
-        postButtons.appendChild(deleteButton);
+    posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.classList.add('post');
 
-        postDiv.appendChild(postButtons);
-        postSection.appendChild(postDiv);
+        // Monta a estrutura do post
+        postElement.innerHTML = `
+            <h3>${post.title}</h3>
+            <p>Autor: ${post.author}</p>
+            <p>${post.content}</p>
+            <button onclick="deletePost('${post.id}')">Excluir</button>
+        `;
+
+        postList.appendChild(postElement);
     });
 }
+
+// Função para alternar entre a visualização da seção de criação de posts
+function toggleCreatePost() {
+    const createPostSection = document.getElementById('createPost');
+
+    if (createPostSection.style.display === 'none') {
+        createPostSection.style.display = 'block';
+    } else {
+        createPostSection.style.display = 'none';
+    }
+}
+
+// Função para criar um novo post
+const postForm = document.getElementById('postForm');
+postForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Impede o comportamento padrão de recarregar a página
+
+    const title = postTitle.value;
+    const author = postAuthor.value;
+    const content = postContent.value;
+
+    // Salva o post no Firestore
+    db.collection('posts').add({
+        title: title,
+        author: author,
+        content: content,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then((docRef) => {
+        console.log('Post adicionado com sucesso! Document ID:', docRef.id);
+        postForm.reset(); // Limpa o formulário após a submissão
+        toggleCreatePost(); // Oculta a seção de criação de posts após a criação
+        fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
+        alert('Post adicionado com sucesso!'); // Alerta de sucesso
+    })
+    .catch(error => {
+        console.error('Erro ao adicionar o post: ', error);
+    });
+});
+
+// Função para excluir um post
+function deletePost(postId) {
+    db.collection('posts').doc(postId).delete()
+    .then(() => {
+        console.log('Post excluído com sucesso!');
+        fetchRecentPosts(); // Atualiza os posts recentes após a exclusão de um post
+        alert('Post excluído com sucesso!'); // Alerta de sucesso
+    })
+    .catch(error => {
+        console.error('Erro ao excluir o post: ', error);
+    });
+}
+
+// Chamada inicial para exibir os posts recentes ao carregar a página
+fetchRecentPosts();

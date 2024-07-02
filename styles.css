@@ -1,0 +1,87 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Cor de fundo inspirada na UFABC */
+    color: #333; /* Cor do texto */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: #00557e; /* Cor do cabeçalho da UFABC */
+    color: #fff; /* Cor do texto no cabeçalho */
+    padding: 10px 20px;
+    width: 100%;
+    text-align: center;
+}
+
+h1, h2 {
+    font-family: 'Arial Black', sans-serif;
+}
+
+section {
+    background-color: #fff; /* Cor de fundo das seções */
+    margin: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 80%;
+    max-width: 800px;
+}
+
+input[type="text"], textarea {
+    width: calc(100% - 20px); /* Ajuste para o padding */
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 200px; /* Ajuste a altura conforme necessário */
+}
+
+button {
+    background-color: #00557e; /* Cor do botão */
+    color: #fff; /* Cor do texto no botão */
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+button#showCreatePost {
+    background-color: #00557e; /* Cor do botão */
+    color: #fff; /* Cor do texto no botão */
+    padding: 20px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 30px;
+}
+
+button:hover {
+    background-color: #003d58; /* Cor de hover do botão */
+}
+
+#postList {
+    margin-top: 20px;
+}
+
+.post {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.post img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}

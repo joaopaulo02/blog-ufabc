@@ -1,32 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog UFABC</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <h1>Blog UFABC</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="create.html">Criar Post</a>
-        </nav>
     </header>
-    <main>
-        <section id="filter">
-            <h2>Filtrar Posts</h2>
-            <label for="filter-title">Título:</label>
-            <input type="text" id="filter-title" oninput="filterPosts()">
-            
-            <label for="filter-date">Data:</label>
-            <input type="date" id="filter-date" oninput="filterPosts()">
-        </section>
-        <section id="posts">
-            <!-- Posts serão carregados dinamicamente aqui -->
-        </section>
-    </main>
+    
+    <section id="createPost" style="display: none;">
+        <h2>Criar Post</h2>
+        <form id="postForm">
+            <div>
+                <label for="postTitle">Título:</label>
+                <input type="text" id="postTitle" name="postTitle" placeholder="Título do post" required>
+            </div>
+            <div>
+                <label for="postAuthor">Autor:</label>
+                <input type="text" id="postAuthor" name="postAuthor" placeholder="Autor do post" required>
+            </div>
+            <div>
+                <label for="postContent">Conteúdo:</label>
+                <textarea id="postContent" name="postContent" placeholder="Conteúdo do post" rows="10" required></textarea>
+            </div>
+            <button type="submit">Publicar</button>
+        </form>
+    </section>
+
+    <button id="showCreatePost" onclick="toggleCreatePost()">Criar Novo Post</button>
+
+    <section>
+        <input type="text" id="filterTitle" placeholder="Filtrar por título">
+        <input type="date" id="filterDate">
+        <button onclick="filterPosts()">Filtrar</button>
+    </section>
+    
+
+    <!-- Seção para exibir posts recentes -->
+    <h2>Posts Recentes</h2>
+    <section id="recentPosts">
+        <!-- Lista de posts recentes será adicionada dinamicamente aqui -->
+    </section>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-firestore-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
