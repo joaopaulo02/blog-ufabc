@@ -28,6 +28,10 @@
                 <label for="postContent">Conteúdo:</label>
                 <textarea id="postContent" name="postContent" placeholder="Conteúdo do post" rows="10" required></textarea>
             </div>
+            <div>
+                <label for="postImage">Imagem:</label>
+                <input type="file" id="postImage" name="postImage" accept="image/*">
+            </div>
             <button type="submit">Publicar</button>
         </form>
     </section>
@@ -43,8 +47,6 @@
         </span>
     </section>
 
-    
-
     <!-- Seção para exibir posts recentes -->
     <h2>Posts Recentes</h2>
     <section id="recentPosts">
@@ -53,6 +55,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.6/firebase-storage-compat.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

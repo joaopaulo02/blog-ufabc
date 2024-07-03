@@ -17,6 +17,9 @@ firebase.initializeApp(firebaseConfig);
 // Inicializa o Firestore
 const db = firebase.firestore();
 
+// Inicializa o Firebase Storage
+const storage = firebase.storage();
+
 // Função para buscar os posts mais recentes
 function fetchRecentPosts() {
     db.collection('posts')
@@ -50,6 +53,7 @@ function displayRecentPosts(posts) {
             <h2>${post.title}</h2>
             <p><strong>Autor:</strong> ${post.author}</p>
             <p>${post.content}</p>
+            ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>
         `;
 
@@ -121,7 +125,6 @@ function hideNoResultsMessage() {
     }
 }
 
-
 // Função para exibir os posts na página
 function displayPosts(posts) {
     const postList = document.getElementById('postList');
@@ -137,6 +140,7 @@ function displayPosts(posts) {
             <h2>${post.title}</h2>
             <p><strong>Autor:</strong> ${post.author}</p>
             <p>${post.content}</p>
+            ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>
         `;
 
@@ -163,24 +167,43 @@ postForm.addEventListener('submit', function(event) {
     const title = postTitle.value;
     const author = postAuthor.value;
     const content = postContent.value;
+    const imageFile = document.getElementById('postImage').files[0];
 
-    // Salva o post no Firestore
-    db.collection('posts').add({
-        title: title,
-        author: author,
-        content: content,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then((docRef) => {
-        console.log('Post adicionado com sucesso! Document ID:', docRef.id);
-        postForm.reset(); // Limpa o formulário após a submissão
-        toggleCreatePost(); // Oculta a seção de criação de posts após a criação
-        fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
-        alert('Post adicionado com sucesso!'); // Alerta de sucesso
-    })
-    .catch(error => {
-        console.error('Erro ao adicionar o post: ', error);
-    });
+    // Função para salvar o post no Firestore
+    function savePost(imageUrl) {
+        db.collection('posts').add({
+            title: title,
+            author: author,
+            content: content,
+            imageUrl: imageUrl || '',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then((docRef) => {
+            console.log('Post adicionado com sucesso! Document ID:', docRef.id);
+            postForm.reset(); // Limpa o formulário após a submissão
+            toggleCreatePost(); // Oculta a seção de criação de posts após a criação
+            fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
+            alert('Post adicionado com sucesso!'); // Alerta de sucesso
+        })
+        .catch(error => {
+            console.error('Erro ao adicionar o post: ', error);
+        });
+    }
+
+    if (imageFile) {
+        const storageRef = storage.ref();
+        const imageRef = storageRef.child('images/' + imageFile.name);
+
+        imageRef.put(imageFile).then((snapshot) => {
+            snapshot.ref.getDownloadURL().then((downloadURL) => {
+                savePost(downloadURL);
+            });
+        }).catch(error => {
+            console.error('Erro ao fazer upload da imagem: ', error);
+        });
+    } else {
+        savePost();
+    }
 });
 
 // Função para excluir um post
