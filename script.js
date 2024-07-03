@@ -20,6 +20,8 @@ const db = firebase.firestore();
 // Inicializa o Firebase Storage
 const storage = firebase.storage();
 
+let editPostId = null; // Variável para armazenar o ID do post em edição
+
 // Função para buscar os posts mais recentes
 function fetchRecentPosts() {
     db.collection('posts')
@@ -55,6 +57,7 @@ function displayRecentPosts(posts) {
             <p>${post.content}</p>
             ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>
+            <button onclick="editPost('${post.id}')">Editar</button>
         `;
 
         recentPostsSection.appendChild(postElement);
@@ -142,6 +145,7 @@ function displayPosts(posts) {
             <p>${post.content}</p>
             ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>
+            <button onclick="editPost('${post.id}')">Editar</button>
         `;
 
         postList.appendChild(postElement);
@@ -156,10 +160,30 @@ function toggleCreatePost() {
         createPostSection.style.display = 'block';
     } else {
         createPostSection.style.display = 'none';
+        editPostId = null; // Reseta o ID do post em edição quando o formulário é escondido
+        postForm.reset(); // Reseta o formulário
     }
 }
 
-// Função para criar um novo post
+// Função para carregar dados do post no formulário para edição
+function editPost(postId) {
+    db.collection('posts').doc(postId).get().then(doc => {
+        if (doc.exists) {
+            const post = doc.data();
+            postTitle.value = post.title;
+            postAuthor.value = post.author;
+            postContent.value = post.content;
+            editPostId = postId; // Armazena o ID do post em edição
+            toggleCreatePost(); // Mostra o formulário de criação/edição
+        } else {
+            console.error('Post não encontrado!');
+        }
+    }).catch(error => {
+        console.error('Erro ao buscar o post:', error);
+    });
+}
+
+// Função para criar ou atualizar um post
 const postForm = document.getElementById('postForm');
 postForm.addEventListener('submit', function(event) {
     event.preventDefault(); // Impede o comportamento padrão de recarregar a página
@@ -171,23 +195,38 @@ postForm.addEventListener('submit', function(event) {
 
     // Função para salvar o post no Firestore
     function savePost(imageUrl) {
-        db.collection('posts').add({
+        const postData = {
             title: title,
             author: author,
             content: content,
             imageUrl: imageUrl || '',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then((docRef) => {
-            console.log('Post adicionado com sucesso! Document ID:', docRef.id);
-            postForm.reset(); // Limpa o formulário após a submissão
-            toggleCreatePost(); // Oculta a seção de criação de posts após a criação
-            fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
-            alert('Post adicionado com sucesso!'); // Alerta de sucesso
-        })
-        .catch(error => {
-            console.error('Erro ao adicionar o post: ', error);
-        });
+        };
+
+        if (editPostId) {
+            // Atualiza o post existente
+            db.collection('posts').doc(editPostId).update(postData).then(() => {
+                console.log('Post atualizado com sucesso!');
+                editPostId = null; // Reseta o ID do post em edição
+                postForm.reset(); // Limpa o formulário após a submissão
+                toggleCreatePost(); // Oculta a seção de criação de posts após a criação
+                fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
+                alert('Post atualizado com sucesso!'); // Alerta de sucesso
+            }).catch(error => {
+                console.error('Erro ao atualizar o post: ', error);
+            });
+        } else {
+            // Cria um novo post
+            db.collection('posts').add(postData).then((docRef) => {
+                console.log('Post adicionado com sucesso! Document ID:', docRef.id);
+                postForm.reset(); // Limpa o formulário após a submissão
+                toggleCreatePost(); // Oculta a seção de criação de posts após a criação
+                fetchRecentPosts(); // Atualiza os posts recentes após a criação de um novo post
+                alert('Post adicionado com sucesso!'); // Alerta de sucesso
+            }).catch(error => {
+                console.error('Erro ao adicionar o post: ', error);
+            });
+        }
     }
 
     if (imageFile) {
@@ -221,3 +260,4 @@ function deletePost(postId) {
 
 // Chamada inicial para exibir os posts recentes ao carregar a página
 fetchRecentPosts();
+
