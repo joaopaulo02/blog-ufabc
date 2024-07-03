@@ -1,4 +1,9 @@
 /* styles.css */
+* {
+    margin: 10px;
+}
+
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0; /* Cor de fundo inspirada na UFABC */
@@ -36,9 +41,13 @@ input[type="text"], textarea {
     width: calc(100% - 20px); /* Ajuste para o padding */
     padding: 10px;
     margin: 5px 0;
+    margin-top: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+label {
+    margin-bottom: 10px;
 }
 
 textarea {
@@ -69,6 +78,8 @@ button:hover {
     background-color:rgb(0,102,51); /* Cor de hover do botão */
 }
 
+
+
 #postList {
     margin-top: 20px;
     border: none;
@@ -80,10 +91,32 @@ button:hover {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    position: relative; /* Define a posição relativa para o post */
+
+    /* Estilos para os botões */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .post img {
-    max-width: 100%;
+    max-width: 300px; /* Ajuste o tamanho máximo conforme necessário */
     height: auto;
     margin-bottom: 10px;
+}
+
+/* Estilos para os botões dentro do post */
+.post .actions {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.post .actions button {
+    margin-left: 5px;
+}
+
+button[onclick="deletePost"], button[onclick="editPost"] {
+    width: 100px;
+    height: 60px;
 }

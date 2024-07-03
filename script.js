@@ -70,6 +70,7 @@ function filterPosts() {
 
     // Obtém os valores dos campos de filtro
     const titleFilter = filterTitle.value.toLowerCase();
+    const authorFilter = filterAuthor.value.toLowerCase(); // Obtém o valor do filtro de autor
     const dateFilter = filterDate.value;
 
     // Referência ao Firestore
@@ -83,11 +84,14 @@ function filterPosts() {
             querySnapshot.forEach(doc => {
                 const post = doc.data();
                 const postTitle = post.title.toLowerCase();
+                const postAuthor = post.author.toLowerCase(); // Obtém o autor do post
                 const postDate = post.timestamp.toDate();
 
                 // Verifica se o título do post contém o filtro de título
+                // E se o autor do post contém o filtro de autor
                 // E se a data do post é maior ou igual à data filtrada
                 if (postTitle.includes(titleFilter) &&
+                    postAuthor.includes(authorFilter) &&
                     (!dateFilter || postDate.toISOString().split('T')[0] === dateFilter)) {
                     filteredPosts.push({ id: doc.id, ...post });
                 }
@@ -107,6 +111,7 @@ function filterPosts() {
             console.error('Erro ao filtrar posts:', error);
         });
 }
+
 
 // Função para exibir mensagem de nenhum resultado encontrado
 function showNoResultsMessage() {
@@ -165,23 +170,28 @@ function toggleCreatePost() {
     }
 }
 
-// Função para carregar dados do post no formulário para edição
+// Função para editar um post
 function editPost(postId) {
-    db.collection('posts').doc(postId).get().then(doc => {
-        if (doc.exists) {
-            const post = doc.data();
-            postTitle.value = post.title;
-            postAuthor.value = post.author;
-            postContent.value = post.content.replace(/\n/g, '<br>'); // Substitui quebras de linha por <br>
-            editPostId = postId; // Armazena o ID do post em edição
-            toggleCreatePost(); // Mostra o formulário de criação/edição
-        } else {
-            console.error('Post não encontrado!');
-        }
-    }).catch(error => {
-        console.error('Erro ao buscar o post:', error);
-    });
+    const confirmEdit = confirm('Tem certeza que deseja editar este post?');
+
+    if (confirmEdit) {
+        db.collection('posts').doc(postId).get().then(doc => {
+            if (doc.exists) {
+                const post = doc.data();
+                postTitle.value = post.title;
+                postAuthor.value = post.author;
+                postContent.value = post.content.replace(/\n/g, '<br>'); // Substitui quebras de linha por <br>
+                editPostId = postId; // Armazena o ID do post em edição
+                toggleCreatePost(); // Mostra o formulário de criação/edição
+            } else {
+                console.error('Post não encontrado!');
+            }
+        }).catch(error => {
+            console.error('Erro ao buscar o post:', error);
+        });
+    }
 }
+
 
 // Função para criar ou atualizar um post
 const postForm = document.getElementById('postForm');
@@ -247,16 +257,21 @@ postForm.addEventListener('submit', function(event) {
 
 // Função para excluir um post
 function deletePost(postId) {
-    db.collection('posts').doc(postId).delete()
-    .then(() => {
-        console.log('Post excluído com sucesso!');
-        fetchRecentPosts(); // Atualiza os posts recentes após a exclusão de um post
-        alert('Post excluído com sucesso!'); // Alerta de sucesso
-    })
-    .catch(error => {
-        console.error('Erro ao excluir o post: ', error);
-    });
+    const confirmDelete = confirm('Tem certeza que deseja excluir este post?');
+
+    if (confirmDelete) {
+        db.collection('posts').doc(postId).delete()
+        .then(() => {
+            console.log('Post excluído com sucesso!');
+            fetchRecentPosts(); // Atualiza os posts recentes após a exclusão de um post
+            alert('Post excluído com sucesso!'); // Alerta de sucesso
+        })
+        .catch(error => {
+            console.error('Erro ao excluir o post: ', error);
+        });
+    }
 }
+
 
 // Chamada inicial para exibir os posts recentes ao carregar a página
 fetchRecentPosts();
