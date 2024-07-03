@@ -22,11 +22,11 @@ const storage = firebase.storage();
 
 let editPostId = null; // Variável para armazenar o ID do post em edição
 
-// Função para buscar os posts mais recentes
+// Função para buscar todos os posts
 function fetchRecentPosts() {
     db.collection('posts')
         .orderBy('timestamp', 'desc')
-        .limit(5) // Limita a 5 posts mais recentes (ajuste conforme necessário)
+        // Removido .limit() para buscar todos os posts
         .get()
         .then(querySnapshot => {
             const posts = [];
@@ -36,7 +36,7 @@ function fetchRecentPosts() {
             displayRecentPosts(posts);
         })
         .catch(error => {
-            console.error('Erro ao buscar posts recentes:', error);
+            console.error('Erro ao buscar posts:', error);
         });
 }
 
@@ -172,7 +172,7 @@ function editPost(postId) {
             const post = doc.data();
             postTitle.value = post.title;
             postAuthor.value = post.author;
-            postContent.value = post.content;
+            postContent.value = post.content.replace(/\n/g, '<br>'); // Substitui quebras de linha por <br>
             editPostId = postId; // Armazena o ID do post em edição
             toggleCreatePost(); // Mostra o formulário de criação/edição
         } else {
@@ -190,7 +190,7 @@ postForm.addEventListener('submit', function(event) {
 
     const title = postTitle.value;
     const author = postAuthor.value;
-    const content = postContent.value;
+    const content = postContent.value.replace(/\n/g, '<br>'); // Substitui quebras de linha por <br>
     const imageFile = document.getElementById('postImage').files[0];
 
     // Função para salvar o post no Firestore
