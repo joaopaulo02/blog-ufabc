@@ -100,14 +100,16 @@ button:hover {
 }
 
 .post img {
-    max-width: 50%;
-    max-height: 50%;
+    max-width: 70%;
+    max-height: 70%;
     height: auto;
     margin-top: 50px;
     margin-bottom: 50px;
     display: block; 
     margin-left: auto; 
     margin-right: auto;
+    border: 5px solid rgb(0,102,51);
+    border-radius: 15px;
 }
 
 /* Estilos para os botões dentro do post */
