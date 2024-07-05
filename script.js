@@ -53,7 +53,7 @@ function displayRecentPosts(posts) {
         // Monta a estrutura do post
         postElement.innerHTML = `
             <h2>${post.title}</h2>
-            <p><strong>Autor:</strong> ${post.author}</p>
+            <p id="author">Autor: ${post.author}</p>
             <p>${post.content}</p>
             ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>
@@ -146,7 +146,7 @@ function displayPosts(posts) {
         // Monta a estrutura do post
         postElement.innerHTML = `
             <h2>${post.title}</h2>
-            <p><strong>Autor:</strong> ${post.author}</p>
+            <p id="author"><Autor: ${post.author}</p>
             <p>${post.content}</p>
             ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
             <button onclick="deletePost('${post.id}')">Excluir</button>

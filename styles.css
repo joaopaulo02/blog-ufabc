@@ -21,6 +21,7 @@ header {
     padding: 10px 20px;
     width: 100%;
     text-align: center;
+    margin: -10px;
 }
 
 h1, h2 {
@@ -71,7 +72,8 @@ button#showCreatePost {
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    margin: 30px;
+    margin: 40px;
+    margin-top: 70px;
 }
 
 button:hover {
@@ -121,4 +123,8 @@ button:hover {
 
 .post .actions button {
     margin-left: 5px;
+}
+
+#author {
+    font-weight: bold;
 }
