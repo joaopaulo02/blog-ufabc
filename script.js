@@ -64,19 +64,65 @@ function displayRecentPosts(posts) {
     });
 }
 
-// Função para filtrar os posts
+// Função para buscar e exibir todos os autores
+function fetchAuthors() {
+    db.collection('posts')
+        .get()
+        .then(querySnapshot => {
+            const authorsSet = new Set();
+            querySnapshot.forEach(doc => {
+                const post = doc.data();
+                authorsSet.add(post.author);
+            });
+
+            displayAuthors(Array.from(authorsSet));
+        })
+        .catch(error => {
+            console.error('Erro ao buscar autores:', error);
+        });
+}
+
+// Função para exibir os botões dos autores
+function displayAuthors(authors) {
+    const authorsList = document.getElementById('authorsList');
+    authorsList.innerHTML = ''; // Limpa o conteúdo existente
+
+    authors.forEach(author => {
+        const authorButton = document.createElement('button');
+        authorButton.textContent = author;
+        authorButton.onclick = () => filterPostsByAuthor(author);
+        authorsList.appendChild(authorButton);
+    });
+}
+
+// Função para filtrar posts por autor
+function filterPostsByAuthor(author) {
+    db.collection('posts')
+        .where('author', '==', author)
+        .orderBy('timestamp', 'desc')
+        .get()
+        .then(querySnapshot => {
+            const posts = [];
+            querySnapshot.forEach(doc => {
+                posts.push({ id: doc.id, ...doc.data() });
+            });
+
+            displayPosts(posts);
+        })
+        .catch(error => {
+            console.error('Erro ao buscar posts por autor:', error);
+        });
+}
+
+// Função para filtrar os posts (por título ou autor)
 function filterPosts() {
     let filteredPosts = [];
 
     // Obtém os valores dos campos de filtro
     const titleFilter = filterTitle.value.toLowerCase();
-    const authorFilter = filterAuthor.value.toLowerCase(); // Obtém o valor do filtro de autor
+    const authorFilter = filterAuthor.value.toLowerCase(); // Adicionado filtro por autor
     const dateFilter = filterDate.value;
 
-    // Referência ao Firestore
-    const db = firebase.firestore();
-
-    // Consulta no Firestore com filtros
     db.collection('posts')
         .orderBy('timestamp', 'desc') // Ordena por data de forma decrescente
         .get()
@@ -84,16 +130,14 @@ function filterPosts() {
             querySnapshot.forEach(doc => {
                 const post = doc.data();
                 const postTitle = post.title.toLowerCase();
-                const postAuthor = post.author.toLowerCase(); // Obtém o autor do post
+                const postAuthor = post.author.toLowerCase(); // Verifica o autor
                 const postDate = post.timestamp.toDate();
 
-                // Verifica se o título do post contém o filtro de título
-                // E se o autor do post contém o filtro de autor
-                // E se a data do post é maior ou igual à data filtrada
+                // Verifica se o título e autor do post contêm os filtros aplicados
                 if (postTitle.includes(titleFilter) &&
                     postAuthor.includes(authorFilter) &&
                     (!dateFilter || postDate.toISOString().split('T')[0] === dateFilter)) {
-                    filteredPosts.push({ id: doc.id, ...post });
+                    filteredPosts.push({ id: doc.id, ...doc.data() });
                 }
             });
 
@@ -133,27 +177,25 @@ function hideNoResultsMessage() {
     }
 }
 
-// Função para exibir os posts na página
+// Função para exibir posts
 function displayPosts(posts) {
-    const postList = document.getElementById('postList');
-
-    postList.innerHTML = '';
+    const postsContainer = document.getElementById('postsContainer');
+    postsContainer.innerHTML = '';
 
     posts.forEach(post => {
         const postElement = document.createElement('div');
         postElement.classList.add('post');
 
-        // Monta a estrutura do post
         postElement.innerHTML = `
             <h2>${post.title}</h2>
-            <p id="author"><Autor: ${post.author}</p>
+            <p id="author">Autor ${post.author}</p>
             <p>${post.content}</p>
             ${post.imageUrl ? `<img src="${post.imageUrl}" alt="Imagem do post">` : ''}
-            <button onclick="deletePost('${post.id}')">Excluir</button>
             <button onclick="editPost('${post.id}')">Editar</button>
+            <button onclick="deletePost('${post.id}')">Excluir</button>
         `;
 
-        postList.appendChild(postElement);
+        postsContainer.appendChild(postElement);
     });
 }
 
@@ -274,5 +316,6 @@ function deletePost(postId) {
 
 
 // Chamada inicial para exibir os posts recentes ao carregar a página
+fetchAuthors();
 fetchRecentPosts();
 

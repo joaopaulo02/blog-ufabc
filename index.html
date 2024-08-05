@@ -10,8 +10,9 @@
 <body>
     <header>
         <h1>Nosso Blog - UFABC</h1>
-        <p>Grupo: João Paulo Alonso, Ruan Diego Sousa, Gabriel A. de Souza, Daniel Carvalho e Luis Carlos Berrio</p>
+        <p>Grupo: João Paulo Nobrega, Ruan Diego Sousa, Gabriel A. de Souza, Daniel Carvalho e Luis Carlos Berrio</p>
     </header>
+
     
     <section id="createPost" style="display: none;">
         <h2>Criar Post</h2>
@@ -38,6 +39,15 @@
 
     <button id="showCreatePost" onclick="toggleCreatePost()">Criar Novo Post</button>
 
+    <!-- Seção para os botões de autores -->
+    <section id="authorsMenu">
+        <h2>Autores</h2>
+        <div id="authorsList">
+            <!-- Botões dos autores serão adicionados dinamicamente aqui -->
+        </div>
+    </section>
+    
+
     <section>
         <input type="text" id="filterTitle" placeholder="Filtrar por título">
         <input type="text" id="filterAuthor" placeholder="Filtrar por autor">
@@ -46,10 +56,18 @@
         <span id="postList">
             <!-- Filtro de posts aparecerá aqui -->
         </span>
+    </section> 
+    
+    <!-- Seção para exibir posts filtrados por autor -->
+    <section id="authorPosts">
+        <h2>Posts filtrados</h2>
+        <div id="postsContainer">
+            <!-- Os posts do autor selecionado serão exibidos aqui -->
+        </div>
     </section>
 
     <!-- Seção para exibir posts recentes -->
-    <h2>Posts Recentes</h2>
+    <h1 id="recent-posts">Posts Recentes</h1>
     <section id="recentPosts">
         <!-- Lista de posts recentes será adicionada dinamicamente aqui -->
     </section>

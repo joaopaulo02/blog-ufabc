@@ -6,17 +6,32 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0; /* Cor de fundo inspirada na UFABC */
-    color: #333; /* Cor do texto */
+    color: rgb(52, 52, 52); /* Cor do texto */
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+
+
+    /* Configurações do fundo */
+    background-image: url('https://t3.ftcdn.net/jpg/08/03/10/74/360_F_803107404_VduenzqhgtEgc9PD43kGJMV3zCWBwBLV.jpg'); /* Substitua pelo caminho da sua imagem */
+
+    /* Diminuir o tamanho da imagem de fundo */
+    background-size: 50%; /* Reduz o tamanho da imagem para 25% do seu tamanho original */
+    
+    background-repeat: repeat; /* Repete a imagem de fundo em toda a tela */
+    background-position: center; /* Centraliza a imagem repetida */
+    
+    /* Cor de fundo semi-transparente */
+    background-color: rgba(0, 0, 0, 0.2); /* Aumenta a transparência do fundo */
+
+    /* Mistura a cor de fundo com a imagem */
+    background-blend-mode: overlay;
 }
 
 header {
-    background-color: rgb(0,102,51); /* Cor do cabeçalho da UFABC */
+    background: linear-gradient(to right, red, orange, green, blue, indigo, violet); /* Cor do cabeçalho da UFABC */
     color: #fff; /* Cor do texto no cabeçalho */
     padding: 10px 20px;
     width: 100%;
@@ -24,8 +39,17 @@ header {
     margin: -10px;
 }
 
+
 h1, h2 {
     font-family: 'Arial Black', sans-serif;
+}
+
+h1#recent-posts {
+    background-color: rgba(0, 102, 51, 0.67);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    border: solid rgb(0,102,51);
 }
 
 section {
@@ -36,6 +60,34 @@ section {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     width: 80%;
     max-width: 800px;
+}
+
+/* Estilo para a seção de autores */
+#authorsMenu {
+    width: 100%;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+#authorsList {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#authorsList button {
+    background-color: rgba(0, 102, 51, 0.67);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+#authorsList button:hover {
+    background-color: rgba(0, 102, 51, 0.438);
 }
 
 input[type="text"], textarea {
